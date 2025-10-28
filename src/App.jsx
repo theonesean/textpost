@@ -64,7 +64,7 @@ const PreviewSection = styled.section`
   align-items: flex-start;
 `;
 
-const defaultContent = `# Welcome to InstaPost
+const defaultContent = `# textpost.spb.li
 
 Create beautiful **Instagram posts** with markdown support!
 
