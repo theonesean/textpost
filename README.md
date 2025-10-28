@@ -139,7 +139,9 @@ Your content here...
 **Available Options:**
 
 - **theme**: `default`, `dark`, `light`, `forest`, `sunset`
-- **imagePosition**: `top` (default) or `bottom`
+- **imagePosition**: `top` (default), `bottom`, `left`, or `right`
+
+> 💡 **Layout tip:** Portrait-oriented images usually look best with `left` or `right` placements, while landscape images tend to shine with `top` or `bottom`.
 
 **Example with multiple posts:**
 
