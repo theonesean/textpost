@@ -62,6 +62,21 @@ const ActionButtons = styled.div`
   justify-content: flex-end;
   gap: ${({ theme }) => theme.spacing.md};
   margin-top: ${({ theme }) => theme.spacing.md};
+  flex-wrap: wrap;
+
+  @media (max-width: 1024px) {
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    ${Button} {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 `;
 
 const HiddenFileInput = styled.input`
