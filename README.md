@@ -128,6 +128,7 @@ Customize each post with metadata using YAML frontmatter at the top:
 ---
 theme: forest
 imagePosition: bottom
+verticalAlign: middle
 ---
 
 # My Post
@@ -140,6 +141,7 @@ Your content here...
 
 - **theme**: `default`, `dark`, `light`, `forest`, `sunset`
 - **imagePosition**: `top` (default), `bottom`, `left`, or `right`
+- **verticalAlign**: `top` (default), `middle`, or `bottom`
 
 > 💡 **Layout tip:** Portrait-oriented images usually look best with `left` or `right` placements, while landscape images tend to shine with `top` or `bottom`.
 

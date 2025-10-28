@@ -190,11 +190,36 @@ const TextContent = styled.div`
   flex: 1;
   overflow: auto;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: ${({ verticalAlign }) => {
+    switch (verticalAlign) {
+      case 'middle':
+        return 'center';
+      case 'bottom':
+        return 'flex-end';
+      default:
+        return 'flex-start';
+    }
+  }};
+  align-items: stretch;
   scrollbar-width: none;
   -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  & > * {
+    width: 100%;
+  }
+
+  & > *:first-of-type {
+    margin-top: 0 !important;
+  }
+
+  & > *:last-of-type {
+    margin-bottom: 0 !important;
   }
 `;
 
@@ -226,9 +251,21 @@ const themeStyles = {
   },
 };
 
+const verticalAlignOptions = ['top', 'middle', 'bottom'];
+
 const PostPreview = React.forwardRef(({ content, metadata = {} }, ref) => {
-  const { theme = 'default', imagePosition = 'top' } = metadata;
+  const {
+    theme = 'default',
+    imagePosition = 'top',
+    verticalAlign = 'top',
+  } = metadata;
   const themeStyle = themeStyles[theme] || themeStyles.default;
+  const normalizedVerticalAlign = typeof verticalAlign === 'string'
+    ? verticalAlign.toLowerCase()
+    : 'top';
+  const verticalAlignValue = verticalAlignOptions.includes(normalizedVerticalAlign)
+    ? normalizedVerticalAlign
+    : 'top';
 
   // Extract images from markdown manually
   const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
@@ -266,7 +303,7 @@ const PostPreview = React.forwardRef(({ content, metadata = {} }, ref) => {
             </ImageSection>
           )}
 
-          <TextContent>
+          <TextContent verticalAlign={verticalAlignValue}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkSmartyPants]}
               components={{
