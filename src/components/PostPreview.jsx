@@ -59,8 +59,10 @@ const PreviewContent = styled.div`
   font-family: ${({ theme }) => theme.fonts.primary};
   line-height: 1.6;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  flex-direction: ${({ imagePosition }) =>
+    ['left', 'right'].includes(imagePosition) ? 'row' : 'column'};
+  gap: ${({ imagePosition, theme }) =>
+    ['left', 'right'].includes(imagePosition) ? theme.spacing.lg : '0.5rem'};
   
   /* Hide scrollbars while keeping scroll functionality */
   scrollbar-width: none;
@@ -69,7 +71,7 @@ const PreviewContent = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     color: ${({ theme }) => theme.colors.white};
     margin-top: 1.5em;
@@ -158,6 +160,44 @@ const PreviewContent = styled.div`
   }
 `;
 
+const ImageSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.sm};
+  width: ${({ imagePosition }) =>
+    ['left', 'right'].includes(imagePosition) ? '40%' : '100%'};
+  max-width: ${({ imagePosition }) =>
+    ['left', 'right'].includes(imagePosition) ? '45%' : '100%'};
+  flex-shrink: 0;
+  overflow-y: ${({ imagePosition }) =>
+    ['left', 'right'].includes(imagePosition) ? 'auto' : 'visible'};
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const StyledImage = styled.img`
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+`;
+
+const TextContent = styled.div`
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
 const themeStyles = {
   default: {
     background: '#0a192f',
@@ -209,95 +249,81 @@ const PostPreview = React.forwardRef(({ content, metadata = {} }, ref) => {
     <PreviewWrapper>
       <PreviewContainer ref={ref} bgColor={themeStyle.background}>
         <PreviewContent textColor={themeStyle.text} imagePosition={imagePosition} accentColor={themeStyle.accent} bgColor={themeStyle.background}>
-        {/* Render images at top if imagePosition is 'top' */}
-        {imagePosition === 'top' && images.map((img, idx) => (
-          <div key={idx} style={{ margin: '0', flexShrink: 0 }}>
-            <img 
-              src={img.src} 
-              alt={img.alt || 'image'} 
-              style={{
-                maxWidth: '100%',
-                height: 'auto',
-                borderRadius: '4px',
-                display: 'block',
-              }}
-              onError={(e) => {
-                console.error('Image failed to load:', img.src.substring(0, 50));
-                e.target.style.display = 'none';
-              }}
-            />
-          </div>
-        ))}
-        
-        <div style={{ 
-          flex: 1, 
-          overflow: 'auto', 
-          minHeight: 0,
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-        className="hide-scrollbar"
-        >
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkSmartyPants]}
-            components={{
-              p({ children }) {
-                return <p><HighlightedContent accentColor={themeStyle.accent} bgColor={themeStyle.background}>{children}</HighlightedContent></p>;
-              },
-              code({node, inline, className, children, ...props}) {
-                const match = /language-(\w+)/.exec(className || '');
-                const codeString = String(children).replace(/\n$/, '');
-                
-                if (!inline && match) {
-                  try {
-                    const highlighted = hljs.highlight(codeString, { 
-                      language: match[1],
-                      ignoreIllegals: true 
-                    }).value;
-                    return (
-                      <code 
-                        className={`hljs language-${match[1]}`}
-                        dangerouslySetInnerHTML={{ __html: highlighted }}
-                        {...props}
-                      />
-                    );
-                  } catch (e) {
-                    // Fallback if language not found
-                    return <code className={className} {...props}>{codeString}</code>;
+          {/* Render images before content for 'top' and 'left' positions */}
+          {['top', 'left'].includes(imagePosition) && images.length > 0 && (
+            <ImageSection imagePosition={imagePosition} className="hide-scrollbar">
+              {images.map((img, idx) => (
+                <StyledImage
+                  key={idx}
+                  src={img.src}
+                  alt={img.alt || 'image'}
+                  onError={(e) => {
+                    console.error('Image failed to load:', img.src.substring(0, 50));
+                    e.target.style.display = 'none';
+                  }}
+                />
+              ))}
+            </ImageSection>
+          )}
+
+          <TextContent>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkSmartyPants]}
+              components={{
+                p({ children }) {
+                  return <p><HighlightedContent accentColor={themeStyle.accent} bgColor={themeStyle.background}>{children}</HighlightedContent></p>;
+                },
+                code({node, inline, className, children, ...props}) {
+                  const match = /language-(\w+)/.exec(className || '');
+                  const codeString = String(children).replace(/\n$/, '');
+
+                  if (!inline && match) {
+                    try {
+                      const highlighted = hljs.highlight(codeString, {
+                        language: match[1],
+                        ignoreIllegals: true
+                      }).value;
+                      return (
+                        <code
+                          className={`hljs language-${match[1]}`}
+                          dangerouslySetInnerHTML={{ __html: highlighted }}
+                          {...props}
+                        />
+                      );
+                    } catch (e) {
+                      // Fallback if language not found
+                      return <code className={className} {...props}>{codeString}</code>;
+                    }
                   }
-                }
-                
-                return (
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
-                );
-              },
-            }}
-          >
-            {contentWithoutImages}
-          </ReactMarkdown>
-        </div>
-        
-        {/* Render images at bottom if imagePosition is 'bottom' */}
-        {imagePosition === 'bottom' && images.map((img, idx) => (
-          <div key={idx} style={{ margin: '0', flexShrink: 0 }}>
-            <img 
-              src={img.src} 
-              alt={img.alt || 'image'} 
-              style={{
-                maxWidth: '100%',
-                height: 'auto',
-                borderRadius: '4px',
-                display: 'block',
+
+                  return (
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                  );
+                },
               }}
-              onError={(e) => {
-                console.error('Image failed to load:', img.src.substring(0, 50));
-                e.target.style.display = 'none';
-              }}
-            />
-          </div>
-        ))}
+            >
+              {contentWithoutImages}
+            </ReactMarkdown>
+          </TextContent>
+
+          {/* Render images after content for 'bottom' and 'right' positions */}
+          {['bottom', 'right'].includes(imagePosition) && images.length > 0 && (
+            <ImageSection imagePosition={imagePosition} className="hide-scrollbar">
+              {images.map((img, idx) => (
+                <StyledImage
+                  key={idx}
+                  src={img.src}
+                  alt={img.alt || 'image'}
+                  onError={(e) => {
+                    console.error('Image failed to load:', img.src.substring(0, 50));
+                    e.target.style.display = 'none';
+                  }}
+                />
+              ))}
+            </ImageSection>
+          )}
         </PreviewContent>
       </PreviewContainer>
     </PreviewWrapper>
