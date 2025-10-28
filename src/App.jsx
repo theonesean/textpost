@@ -66,7 +66,7 @@ const PreviewSection = styled.section`
 
 const defaultContent = `# textpost.spb.li
 
-Create beautiful **Instagram posts** with markdown support!
+Create beautiful **Instagram posts** with Markdown support!
 
 ## Features
 
@@ -255,7 +255,7 @@ function App() {
       <AppContainer>
         <Header>
           <h1>textpost<span style={{ color: theme.colors.textSecondary, opacity: 0.5 }}>.spb.li</span></h1>
-          <p>Create beautiful Instagram posts with markdown</p>
+          <p>Create beautiful Instagram posts with Markdown</p>
         </Header>
         
         <MainContent>

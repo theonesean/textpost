@@ -1,6 +1,6 @@
 # textpost - Instagram post generator
 
-A modern, brutalist-designed web app for creating beautiful Instagram posts with markdown support. Write, preview, and export your posts as high-quality PNG images or JSON data.
+A modern, brutalist-designed web app for creating beautiful Instagram posts with Markdown support. Write, preview, and export your posts as high-quality PNG images or JSON data.
 
 ## Features
 
