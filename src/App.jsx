@@ -176,6 +176,10 @@ function App() {
 
     try {
       const timestamp = getTimestamp();
+      const originalPostIndex = Math.min(
+        Math.max(currentPostIndex, 0),
+        posts.length - 1
+      );
 
       // Export single or all posts
       const clampedCurrentIndex = Math.min(
@@ -228,9 +232,13 @@ function App() {
         saveAs(dataUrl, filename);
       }
 
-      // Reset to first post
-      setCurrentPostIndex(0);
-      
+      if (singleSlide) {
+        setCurrentPostIndex(originalPostIndex);
+      } else {
+        // Reset to first post after exporting all slides
+        setCurrentPostIndex(0);
+      }
+
     } catch (error) {
       console.error('Error exporting image:', error);
     }
