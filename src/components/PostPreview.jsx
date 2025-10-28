@@ -33,6 +33,12 @@ const HighlightedContent = ({ children, accentColor, bgColor }) => {
   );
 };
 
+const PreviewWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+`;
+
 const PreviewContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -42,7 +48,6 @@ const PreviewContainer = styled.div`
   overflow: hidden;
   width: 500px;
   aspect-ratio: 1/1;
-  margin: 0 auto;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 `;
 
@@ -201,8 +206,9 @@ const PostPreview = React.forwardRef(({ content, metadata = {} }, ref) => {
   const contentWithoutImages = content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '');
 
   return (
-    <PreviewContainer ref={ref} bgColor={themeStyle.background}>
-      <PreviewContent textColor={themeStyle.text} imagePosition={imagePosition} accentColor={themeStyle.accent} bgColor={themeStyle.background}>
+    <PreviewWrapper>
+      <PreviewContainer ref={ref} bgColor={themeStyle.background}>
+        <PreviewContent textColor={themeStyle.text} imagePosition={imagePosition} accentColor={themeStyle.accent} bgColor={themeStyle.background}>
         {/* Render images at top if imagePosition is 'top' */}
         {imagePosition === 'top' && images.map((img, idx) => (
           <div key={idx} style={{ margin: '0', flexShrink: 0 }}>
@@ -292,8 +298,9 @@ const PostPreview = React.forwardRef(({ content, metadata = {} }, ref) => {
             />
           </div>
         ))}
-      </PreviewContent>
-    </PreviewContainer>
+        </PreviewContent>
+      </PreviewContainer>
+    </PreviewWrapper>
   );
 });
 

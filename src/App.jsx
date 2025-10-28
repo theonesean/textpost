@@ -186,7 +186,8 @@ function App() {
           height: 500,
           backgroundColor: bgColor,
           allowTaint: true,
-          useCORS: false
+          useCORS: false,
+          
         });
         
         // Download with post number
