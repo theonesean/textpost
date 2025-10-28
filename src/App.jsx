@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { Global, ThemeProvider } from '@emotion/react';
 import { toPng } from 'html-to-image';
@@ -126,6 +126,20 @@ function App() {
   const postTexts = content.split(/\n===\n/).filter(post => post.trim());
   const posts = postTexts.map(parsePost);
   const currentPostData = posts[currentPostIndex] || { metadata: { theme: 'default', imagePosition: 'top' }, content: '' };
+
+  useEffect(() => {
+    if (posts.length === 0) {
+      if (currentPostIndex !== 0) {
+        setCurrentPostIndex(0);
+      }
+      return;
+    }
+
+    const safeIndex = Math.min(currentPostIndex, posts.length - 1);
+    if (safeIndex !== currentPostIndex) {
+      setCurrentPostIndex(safeIndex);
+    }
+  }, [posts.length, currentPostIndex]);
 
   const handleContentChange = (newContent) => {
     setContent(newContent);
@@ -307,7 +321,25 @@ function App() {
                   </div>
                 )}
               </div>
-              <PostPreview ref={previewRef} content={currentPostData.content || 'Start typing to see the preview...'} metadata={currentPostData.metadata} />
+              {posts.length === 0 ? (
+                <div
+                  style={{
+                    padding: '2rem',
+                    textAlign: 'center',
+                    border: '1px dashed rgba(255, 255, 255, 0.2)',
+                    borderRadius: '8px',
+                    color: theme.colors.textSecondary,
+                  }}
+                >
+                  All posts have been deleted. Start typing in the editor to create a new post.
+                </div>
+              ) : (
+                <PostPreview
+                  ref={previewRef}
+                  content={currentPostData.content || 'Start typing to see the preview...'}
+                  metadata={currentPostData.metadata}
+                />
+              )}
             </div>
           </PreviewSection>
         </MainContent>
