@@ -254,7 +254,7 @@ function App() {
       />
       <AppContainer>
         <Header>
-          <h1>textpost</h1>
+          <h1>textpost<span style={{ color: theme.colors.textSecondary, opacity: 0.5 }}>.spb.li</span></h1>
           <p>Create beautiful Instagram posts with markdown</p>
         </Header>
         
