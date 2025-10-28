@@ -190,6 +190,16 @@ const TextContent = styled.div`
   flex: 1;
   overflow: auto;
   min-height: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const TextContentInner = styled.div`
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: ${({ verticalAlign }) => {
@@ -203,12 +213,6 @@ const TextContent = styled.div`
     }
   }};
   align-items: stretch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
 
   & > * {
     width: 100%;
@@ -303,8 +307,9 @@ const PostPreview = React.forwardRef(({ content, metadata = {} }, ref) => {
             </ImageSection>
           )}
 
-          <TextContent verticalAlign={verticalAlignValue}>
-            <ReactMarkdown
+          <TextContent>
+            <TextContentInner verticalAlign={verticalAlignValue}>
+              <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkSmartyPants]}
               components={{
                 p({ children }) {
@@ -340,9 +345,10 @@ const PostPreview = React.forwardRef(({ content, metadata = {} }, ref) => {
                   );
                 },
               }}
-            >
-              {contentWithoutImages}
-            </ReactMarkdown>
+              >
+                {contentWithoutImages}
+              </ReactMarkdown>
+            </TextContentInner>
           </TextContent>
 
           {/* Render images after content for 'bottom' and 'right' positions */}
