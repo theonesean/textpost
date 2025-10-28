@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run generate-og && tsc -b && vite build",
+    "build": "npm run generate-og && vite build",
     "generate-og": "node scripts/generate-og-image.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
