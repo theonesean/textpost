@@ -154,32 +154,49 @@ function App() {
 
   const handleExport = async (singleSlide = false) => {
     if (!previewRef.current) return;
-    
+
+    if (posts.length === 0) {
+      console.warn('Export aborted: no posts available.');
+      return;
+    }
+
     try {
       const timestamp = getTimestamp();
-      
+
       // Export single or all posts
-      const startIdx = singleSlide ? currentPostIndex : 0;
-      const endIdx = singleSlide ? currentPostIndex + 1 : posts.length;
-      
+      const clampedCurrentIndex = Math.min(
+        Math.max(currentPostIndex, 0),
+        posts.length - 1
+      );
+      const startIdx = singleSlide ? clampedCurrentIndex : 0;
+      const endIdx = singleSlide
+        ? Math.min(clampedCurrentIndex + 1, posts.length)
+        : posts.length;
+
       for (let i = startIdx; i < endIdx; i++) {
+        const post = posts[i];
+        if (!post) {
+          console.error(`Skipping export: post at index ${i} is undefined.`);
+          continue;
+        }
+
         // Wait a bit between exports to avoid issues
         if (i > startIdx) {
           await new Promise(resolve => setTimeout(resolve, 500));
         }
-        
+
         // Switch to post
         setCurrentPostIndex(i);
-        
+
         // Wait for render
         await new Promise(resolve => setTimeout(resolve, 300));
-        
+
         // Get the post's theme background color
-        const postTheme = posts[i].metadata.theme || 'default';
+        const postTheme = post.metadata?.theme || 'default';
         const bgColor = themeStyles[postTheme]?.background || themeStyles.default.background;
-        
+
         // Export - capture only the preview container itself
-        const dataUrl = await toPng(previewRef.current, { 
+        const dataUrl = await toPng(previewRef.current, {
           quality: 1,
           pixelRatio: 2,
           width: 500,
@@ -189,14 +206,14 @@ function App() {
           useCORS: false,
           
         });
-        
+
         // Download with post number
-        const filename = posts.length > 1 
+        const filename = posts.length > 1
           ? `instagram-post-${timestamp}-${i + 1}.png`
           : `instagram-post-${timestamp}.png`;
         saveAs(dataUrl, filename);
       }
-      
+
       // Reset to first post
       setCurrentPostIndex(0);
       
