@@ -154,13 +154,15 @@ function App() {
 
   const handleExport = async (singleSlide = false) => {
     if (!previewRef.current) return;
+
+    const originalPostIndex = currentPostIndex;
     
     try {
       const timestamp = getTimestamp();
       
       // Export single or all posts
-      const startIdx = singleSlide ? currentPostIndex : 0;
-      const endIdx = singleSlide ? currentPostIndex + 1 : posts.length;
+      const startIdx = singleSlide ? originalPostIndex : 0;
+      const endIdx = singleSlide ? originalPostIndex + 1 : posts.length;
       
       for (let i = startIdx; i < endIdx; i++) {
         // Wait a bit between exports to avoid issues
@@ -197,8 +199,12 @@ function App() {
         saveAs(dataUrl, filename);
       }
       
-      // Reset to first post
-      setCurrentPostIndex(0);
+      if (singleSlide) {
+        setCurrentPostIndex(originalPostIndex);
+      } else {
+        // Reset to first post for full exports
+        setCurrentPostIndex(0);
+      }
       
     } catch (error) {
       console.error('Error exporting image:', error);
