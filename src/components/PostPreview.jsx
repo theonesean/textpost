@@ -164,16 +164,15 @@ const ImageSection = styled.div`
   display: flex;
   flex-direction: ${({ imagePosition }) =>
     ['left', 'right'].includes(imagePosition) ? 'column' : 'row'};
-  flex-wrap: ${({ imagePosition }) =>
-    ['top', 'bottom'].includes(imagePosition) ? 'nowrap' : 'wrap'};
+  flex-wrap: nowrap;
   gap: ${({ theme }) => theme.spacing.sm};
   width: ${({ imagePosition }) =>
     ['left', 'right'].includes(imagePosition) ? '40%' : '100%'};
   max-width: ${({ imagePosition }) =>
     ['left', 'right'].includes(imagePosition) ? '45%' : '100%'};
   flex-shrink: 0;
-  overflow-y: ${({ imagePosition }) =>
-    ['left', 'right'].includes(imagePosition) ? 'auto' : 'visible'};
+  max-height: 100%;
+  overflow-y: auto;
   overflow-x: auto;
   align-items: stretch;
   scrollbar-width: none;
