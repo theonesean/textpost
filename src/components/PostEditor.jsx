@@ -101,6 +101,7 @@ const PostEditor = ({
   onExport,
   onExportMarkdown,
   onImportMarkdown,
+  onCursorPositionChange,
 }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -108,9 +109,23 @@ const PostEditor = ({
   const [isImportingMarkdown, setIsImportingMarkdown] = useState(false);
   const fileInputRef = useRef(null);
   const markdownFileInputRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  const notifyCursorPosition = (position) => {
+    if (typeof onCursorPositionChange === 'function') {
+      onCursorPositionChange(position);
+    }
+  };
+
+  const handleSelectionChange = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    notifyCursorPosition(textarea.selectionStart || 0);
+  };
 
   const insertMarkdown = (prefix, suffix = '', defaultText = '') => {
-    const textarea = document.getElementById('post-editor');
+    const textarea = textareaRef.current;
+    if (!textarea) return;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = content.substring(start, end);
@@ -126,6 +141,7 @@ const PostEditor = ({
     setTimeout(() => {
       textarea.focus();
       textarea.setSelectionRange(newCursorPos, newCursorPos);
+      notifyCursorPosition(newCursorPos);
     }, 0);
   };
 
@@ -174,7 +190,8 @@ const PostEditor = ({
     window.instaPostBlobUrls[blobUrl] = blobUrl;
     
     // Insert blob URL into markdown
-    const textarea = document.getElementById('post-editor');
+    const textarea = textareaRef.current;
+    if (!textarea) return;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const beforeText = content.substring(0, start);
@@ -190,6 +207,7 @@ const PostEditor = ({
       textarea.focus();
       const newCursorPos = start + markdownImage.length;
       textarea.setSelectionRange(newCursorPos, newCursorPos);
+      notifyCursorPosition(newCursorPos);
     }, 0);
 
     // Reset input so the same file can be selected again
@@ -266,8 +284,16 @@ const PostEditor = ({
       
       <TextArea
         id="post-editor"
+        ref={textareaRef}
         value={content}
-        onChange={(e) => onContentChange(e.target.value)}
+        onChange={(e) => {
+          onContentChange(e.target.value);
+          notifyCursorPosition(e.target.selectionStart || 0);
+        }}
+        onClick={handleSelectionChange}
+        onKeyUp={handleSelectionChange}
+        onMouseUp={handleSelectionChange}
+        onSelect={handleSelectionChange}
         placeholder="Write your Instagram post here..."
       />
       
