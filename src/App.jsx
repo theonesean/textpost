@@ -107,6 +107,7 @@ function App() {
         metadata: {
           theme: metadata.theme || 'default',
           imagePosition: metadata.imagePosition || 'top',
+          verticalAlign: metadata.verticalAlign || 'top',
           ...metadata
         },
         content: match[2]
@@ -116,7 +117,8 @@ function App() {
     return {
       metadata: {
         theme: 'default',
-        imagePosition: 'top'
+        imagePosition: 'top',
+        verticalAlign: 'top'
       },
       content: postText
     };
@@ -125,7 +127,7 @@ function App() {
   // Split content by === separator
   const postTexts = content.split(/\n===\n/).filter(post => post.trim());
   const posts = postTexts.map(parsePost);
-  const currentPostData = posts[currentPostIndex] || { metadata: { theme: 'default', imagePosition: 'top' }, content: '' };
+  const currentPostData = posts[currentPostIndex] || { metadata: { theme: 'default', imagePosition: 'top', verticalAlign: 'top' }, content: '' };
 
   useEffect(() => {
     if (posts.length === 0) {
