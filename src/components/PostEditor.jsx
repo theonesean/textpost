@@ -179,38 +179,46 @@ const PostEditor = ({
   };
 
   const handleImageUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    // Create a blob URL for the image
-    const blobUrl = URL.createObjectURL(file);
-    
-    // Store blob URL globally so it persists
-    window.instaPostBlobUrls = window.instaPostBlobUrls || {};
-    window.instaPostBlobUrls[blobUrl] = blobUrl;
-    
-    // Insert blob URL into markdown
     const textarea = textareaRef.current;
     if (!textarea) return;
+
+    let insertedText = '';
+    const fileArray = Array.from(files);
+
+    // Process all selected files
+    fileArray.forEach((file) => {
+      // Create a blob URL for the image
+      const blobUrl = URL.createObjectURL(file);
+      
+      // Store blob URL globally so it persists
+      window.instaPostBlobUrls = window.instaPostBlobUrls || {};
+      window.instaPostBlobUrls[blobUrl] = blobUrl;
+      
+      insertedText += `\n![image](${blobUrl})\n`;
+    });
+
+    // Insert all blob URLs into markdown
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const beforeText = content.substring(0, start);
     const afterText = content.substring(end);
     
-    const markdownImage = `\n![image](${blobUrl})\n`;
-    const newText = `${beforeText}${markdownImage}${afterText}`;
+    const newText = `${beforeText}${insertedText}${afterText}`;
     
     onContentChange(newText);
     
-    // Set cursor position after inserted image
+    // Set cursor position after inserted images
     setTimeout(() => {
       textarea.focus();
-      const newCursorPos = start + markdownImage.length;
+      const newCursorPos = start + insertedText.length;
       textarea.setSelectionRange(newCursorPos, newCursorPos);
       notifyCursorPosition(newCursorPos);
     }, 0);
 
-    // Reset input so the same file can be selected again
+    // Reset input so the same files can be selected again
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -272,6 +280,7 @@ const PostEditor = ({
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        multiple
         onChange={handleImageUpload}
       />
 
