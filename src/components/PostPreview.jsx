@@ -174,8 +174,7 @@ const ImageSection = styled.div`
   flex-shrink: 0;
   overflow-y: ${({ imagePosition }) =>
     ['left', 'right'].includes(imagePosition) ? 'auto' : 'visible'};
-  overflow-x: ${({ imagePosition }) =>
-    ['top', 'bottom'].includes(imagePosition) ? 'auto' : 'hidden'};
+  overflow-x: auto;
   align-items: stretch;
   scrollbar-width: none;
   -ms-overflow-style: none;
