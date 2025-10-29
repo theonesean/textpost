@@ -1,6 +1,17 @@
 import React, { useState, useRef } from 'react';
 import styled from '@emotion/styled';
-import { FiBold, FiItalic, FiList, FiCode, FiImage, FiSave, FiDownload, FiFileText, FiEdit3 } from 'react-icons/fi';
+import {
+  FiBold,
+  FiItalic,
+  FiList,
+  FiCode,
+  FiImage,
+  FiSave,
+  FiDownload,
+  FiFileText,
+  FiEdit3,
+  FiUpload,
+} from 'react-icons/fi';
 
 const EditorContainer = styled.div`
   display: flex;
@@ -83,11 +94,20 @@ const HiddenFileInput = styled.input`
   display: none;
 `;
 
-const PostEditor = ({ content, onContentChange, onSave, onExport, onExportMarkdown }) => {
+const PostEditor = ({
+  content,
+  onContentChange,
+  onSave,
+  onExport,
+  onExportMarkdown,
+  onImportMarkdown,
+}) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isExportingMarkdown, setIsExportingMarkdown] = useState(false);
+  const [isImportingMarkdown, setIsImportingMarkdown] = useState(false);
   const fileInputRef = useRef(null);
+  const markdownFileInputRef = useRef(null);
 
   const insertMarkdown = (prefix, suffix = '', defaultText = '') => {
     const textarea = document.getElementById('post-editor');
@@ -178,6 +198,29 @@ const PostEditor = ({ content, onContentChange, onSave, onExport, onExportMarkdo
     }
   };
 
+  const handleMarkdownImport = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImportingMarkdown(true);
+
+    try {
+      const text = await file.text();
+      if (onImportMarkdown) {
+        onImportMarkdown(text);
+      } else {
+        onContentChange(text);
+      }
+    } catch (error) {
+      console.error('Error importing markdown file:', error);
+    } finally {
+      setIsImportingMarkdown(false);
+      if (markdownFileInputRef.current) {
+        markdownFileInputRef.current.value = '';
+      }
+    }
+  };
+
   return (
     <EditorContainer>
       <Toolbar>
@@ -206,12 +249,19 @@ const PostEditor = ({ content, onContentChange, onSave, onExport, onExportMarkdo
           <span>Image</span>
         </Button>
       </Toolbar>
-      
+
       <HiddenFileInput
         ref={fileInputRef}
         type="file"
         accept="image/*"
         onChange={handleImageUpload}
+      />
+
+      <HiddenFileInput
+        ref={markdownFileInputRef}
+        type="file"
+        accept=".md,text/markdown"
+        onChange={handleMarkdownImport}
       />
       
       <TextArea
@@ -229,6 +279,10 @@ const PostEditor = ({ content, onContentChange, onSave, onExport, onExportMarkdo
         <Button onClick={handleExportMarkdown} disabled={isExportingMarkdown}>
           <FiFileText />
           <span>{isExportingMarkdown ? 'Exporting...' : 'Export MD'}</span>
+        </Button>
+        <Button onClick={() => markdownFileInputRef.current?.click()} disabled={isImportingMarkdown}>
+          <FiUpload />
+          <span>{isImportingMarkdown ? 'Importing...' : 'Import MD'}</span>
         </Button>
         <Button onClick={() => onExport(true)}>
           <FiDownload />
