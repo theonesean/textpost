@@ -218,14 +218,6 @@ const TextContentInner = styled.div`
   & > * {
     width: 100%;
   }
-
-  & > *:first-of-type {
-    margin-top: 0 !important;
-  }
-
-  & > *:last-of-type {
-    margin-bottom: 0 !important;
-  }
 `;
 
 const themeStyles = {
