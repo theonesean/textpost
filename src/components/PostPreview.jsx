@@ -162,15 +162,19 @@ const PreviewContent = styled.div`
 
 const ImageSection = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: ${({ imagePosition }) =>
+    ['left', 'right'].includes(imagePosition) ? 'column' : 'row'};
+  flex-wrap: nowrap;
   gap: ${({ theme }) => theme.spacing.sm};
   width: ${({ imagePosition }) =>
     ['left', 'right'].includes(imagePosition) ? '40%' : '100%'};
   max-width: ${({ imagePosition }) =>
     ['left', 'right'].includes(imagePosition) ? '45%' : '100%'};
   flex-shrink: 0;
-  overflow-y: ${({ imagePosition }) =>
-    ['left', 'right'].includes(imagePosition) ? 'auto' : 'visible'};
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: auto;
+  align-items: stretch;
   scrollbar-width: none;
   -ms-overflow-style: none;
 
@@ -184,6 +188,7 @@ const StyledImage = styled.img`
   height: auto;
   border-radius: 4px;
   display: block;
+  object-fit: cover;
 `;
 
 const TextContent = styled.div`
@@ -286,17 +291,25 @@ const PostPreview = React.forwardRef(({ content, metadata = {} }, ref) => {
           {/* Render images before content for 'top' and 'left' positions */}
           {['top', 'left'].includes(imagePosition) && images.length > 0 && (
             <ImageSection imagePosition={imagePosition} className="hide-scrollbar">
-              {images.map((img, idx) => (
-                <StyledImage
-                  key={idx}
-                  src={img.src}
-                  alt={img.alt || 'image'}
-                  onError={(e) => {
-                    console.error('Image failed to load:', img.src.substring(0, 50));
-                    e.target.style.display = 'none';
-                  }}
-                />
-              ))}
+              {images.map((img, idx) => {
+                const imageWidth = `${100 / images.length}%`;
+                const sharedImageStyles = ['top', 'bottom'].includes(imagePosition)
+                  ? { flex: `0 0 ${imageWidth}`, maxWidth: imageWidth }
+                  : {};
+
+                return (
+                  <StyledImage
+                    key={idx}
+                    src={img.src}
+                    alt={img.alt || 'image'}
+                    style={sharedImageStyles}
+                    onError={(e) => {
+                      console.error('Image failed to load:', img.src.substring(0, 50));
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                );
+              })}
             </ImageSection>
           )}
 
@@ -347,17 +360,25 @@ const PostPreview = React.forwardRef(({ content, metadata = {} }, ref) => {
           {/* Render images after content for 'bottom' and 'right' positions */}
           {['bottom', 'right'].includes(imagePosition) && images.length > 0 && (
             <ImageSection imagePosition={imagePosition} className="hide-scrollbar">
-              {images.map((img, idx) => (
-                <StyledImage
-                  key={idx}
-                  src={img.src}
-                  alt={img.alt || 'image'}
-                  onError={(e) => {
-                    console.error('Image failed to load:', img.src.substring(0, 50));
-                    e.target.style.display = 'none';
-                  }}
-                />
-              ))}
+              {images.map((img, idx) => {
+                const imageWidth = `${100 / images.length}%`;
+                const sharedImageStyles = ['top', 'bottom'].includes(imagePosition)
+                  ? { flex: `0 0 ${imageWidth}`, maxWidth: imageWidth }
+                  : {};
+
+                return (
+                  <StyledImage
+                    key={idx}
+                    src={img.src}
+                    alt={img.alt || 'image'}
+                    style={sharedImageStyles}
+                    onError={(e) => {
+                      console.error('Image failed to load:', img.src.substring(0, 50));
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                );
+              })}
             </ImageSection>
           )}
         </PreviewContent>
