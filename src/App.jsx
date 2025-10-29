@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { Global, ThemeProvider } from '@emotion/react';
 import { toPng } from 'html-to-image';
@@ -124,10 +124,43 @@ function App() {
     };
   };
 
-  // Split content by === separator
-  const postTexts = content.split(/\n===\n/).filter(post => post.trim());
-  const posts = postTexts.map(parsePost);
-  const currentPostData = posts[currentPostIndex] || { metadata: { theme: 'default', imagePosition: 'top', verticalAlign: 'top' }, content: '' };
+  const postsWithPositions = useMemo(() => {
+    const separatorRegex = /\n===\n/g;
+    const positions = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = separatorRegex.exec(content)) !== null) {
+      const segment = content.slice(lastIndex, match.index);
+      if (segment.trim()) {
+        positions.push({
+          text: segment,
+          start: lastIndex,
+        });
+      }
+      lastIndex = match.index + match[0].length;
+    }
+
+    const finalSegment = content.slice(lastIndex);
+    if (finalSegment.trim()) {
+      positions.push({
+        text: finalSegment,
+        start: lastIndex,
+      });
+    }
+
+    return positions;
+  }, [content]);
+
+  const posts = useMemo(
+    () => postsWithPositions.map(({ text }) => parsePost(text)),
+    [postsWithPositions]
+  );
+
+  const currentPostData = posts[currentPostIndex] || {
+    metadata: { theme: 'default', imagePosition: 'top', verticalAlign: 'top' },
+    content: '',
+  };
 
   useEffect(() => {
     if (posts.length === 0) {
@@ -142,6 +175,35 @@ function App() {
       setCurrentPostIndex(safeIndex);
     }
   }, [posts.length, currentPostIndex]);
+
+  const handleCursorPositionChange = useCallback((cursorPosition) => {
+    if (!postsWithPositions.length) return;
+
+    const normalizedCursor = Math.max(
+      0,
+      Math.min(
+        Number.isFinite(cursorPosition) ? cursorPosition : 0,
+        content.length
+      )
+    );
+
+    let newIndex = postsWithPositions.findIndex((post, index) => {
+      const start = post.start;
+      const nextStart = postsWithPositions[index + 1]?.start ?? content.length;
+      if (index === postsWithPositions.length - 1 && normalizedCursor === content.length) {
+        return true;
+      }
+      return normalizedCursor >= start && normalizedCursor < nextStart;
+    });
+
+    if (newIndex === -1) {
+      newIndex = postsWithPositions.length - 1;
+    }
+
+    if (newIndex !== currentPostIndex) {
+      setCurrentPostIndex(newIndex);
+    }
+  }, [postsWithPositions, content.length, currentPostIndex]);
 
   const handleContentChange = (newContent) => {
     setContent(newContent);
@@ -315,6 +377,7 @@ function App() {
               onExport={handleExport}
               onExportMarkdown={handleExportMarkdown}
               onImportMarkdown={handleImportMarkdown}
+              onCursorPositionChange={handleCursorPositionChange}
             />
           </EditorSection>
           
