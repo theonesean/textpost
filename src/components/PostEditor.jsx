@@ -248,10 +248,6 @@ const PostEditor = ({
           <FiImage />
           <span>Image</span>
         </Button>
-        <Button onClick={() => markdownFileInputRef.current?.click()} disabled={isImportingMarkdown}>
-          <FiUpload />
-          <span>{isImportingMarkdown ? 'Importing...' : 'Import MD'}</span>
-        </Button>
       </Toolbar>
 
       <HiddenFileInput
@@ -283,6 +279,10 @@ const PostEditor = ({
         <Button onClick={handleExportMarkdown} disabled={isExportingMarkdown}>
           <FiFileText />
           <span>{isExportingMarkdown ? 'Exporting...' : 'Export MD'}</span>
+        </Button>
+        <Button onClick={() => markdownFileInputRef.current?.click()} disabled={isImportingMarkdown}>
+          <FiUpload />
+          <span>{isImportingMarkdown ? 'Importing...' : 'Import MD'}</span>
         </Button>
         <Button onClick={() => onExport(true)}>
           <FiDownload />
