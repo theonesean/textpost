@@ -148,6 +148,12 @@ function App() {
     localStorage.setItem('instaPostContent', newContent);
   };
 
+  const handleImportMarkdown = (importedContent) => {
+    setContent(importedContent);
+    localStorage.setItem('instaPostContent', importedContent);
+    setCurrentPostIndex(0);
+  };
+
   const handleSave = async () => {
     // Save to localStorage is already handled in handleContentChange
     return new Promise((resolve) => {
@@ -308,6 +314,7 @@ function App() {
               onSave={handleSave}
               onExport={handleExport}
               onExportMarkdown={handleExportMarkdown}
+              onImportMarkdown={handleImportMarkdown}
             />
           </EditorSection>
           
